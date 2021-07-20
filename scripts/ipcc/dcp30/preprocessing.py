@@ -17,6 +17,7 @@ def write_csv(output, scenario):
     for var_name in os.listdir(directory):
         files_dir = os.path.join(directory, var_name, ending_sub_dirs)
         df_list_for_var = []
+        print(files_dir)
         for filename in os.listdir(files_dir):
             if filename.endswith('.nc'):
                 print(filename)
