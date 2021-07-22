@@ -45,6 +45,7 @@ def run(argv=None):
     google_cloud_options.job_name='nasa_ipcc'
     google_cloud_options.staging_location='gs://datcom-dataflow-staging-dev/nasa_ipcc_staging'
     google_cloud_options.temp_location='gs://datcom-dataflow-staging-dev/nasa_ipcc_temp'
+    google_cloud_options.region='us-central1'
     options.view_as(StandardOptions).runner = 'DataflowRunner'
 
     # get file paths from GCS 
