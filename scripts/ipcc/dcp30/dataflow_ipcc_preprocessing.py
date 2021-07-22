@@ -1,4 +1,5 @@
 import argparse
+import logging
 import os
 
 import xarray as xr
@@ -71,4 +72,5 @@ def run(argv=None):
     p.run()
 
 if __name__ == '__main__':
+    logging.getLogger().setLevel(logging.INFO)
     run()
