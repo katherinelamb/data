@@ -42,6 +42,7 @@ def run(argv=None):
     parser.add_argument('--project', default='datcom-204919')
     known_args, pipeline_args = parser.parse_known_args(argv)
 
+    '''
     options = PipelineOptions(flags=argv)
     google_cloud_options = options.view_as(GoogleCloudOptions)
     google_cloud_options.project=known_args.project
@@ -50,6 +51,16 @@ def run(argv=None):
     google_cloud_options.temp_location='gs://datcom-dataflow-staging-dev/nasa_ipcc_temp'
     google_cloud_options.region='us-central1'
     options.view_as(StandardOptions).runner = 'DataflowRunner'
+    '''
+    options = PipelineOptions(
+        pipeline_args,
+        runner='DataflowRunner',
+        project='datcom-204919',
+        job_name='ipcc',
+        staging_location='gs://datcom-dataflow-staging-dev/nasa_ipcc_staging',
+        temp_location='gs://datcom-dataflow-staging-dev/nasa_ipcc_temp',
+        region='us-central1'
+    )
 
     # get file paths from GCS 
     input_files = []
