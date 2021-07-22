@@ -10,9 +10,11 @@ from apache_beam.options.pipeline_options import PipelineOptions
 from apache_beam.options.pipeline_options import GoogleCloudOptions
 from apache_beam.options.pipeline_options import StandardOptions
 
-def netcdf_to_df(gcs_filepath, all_vars, proj_name):
+def netcdf_to_df(gcs_filepath, all_vars, proj_name, bucket_name):
     client = storage.Client(project=proj_name)
-    client.download_blob_to_file(gcs_filepath, 'temp.nc')
+    bucket = client.get_bucket(bucket_name)
+    blob = bucket.blob(gcs_filepath) 
+    blob.download_to_filename('temp.nc')
     ds = xr.open_dataset('temp.nc', engine='netcdf4')
     model_name = ds.attrs['driving_model_id']
     curr_var_name = ds.attrs['variableName']
@@ -56,11 +58,11 @@ def run(argv=None):
         prefix = os.path.join(known_args.prefix_start, v, known_args.prefix_end)
         for blob in bucket.list_blobs(prefix=prefix):
             if blob.name.endswith('.nc'):
-                input_files.append(os.path.join('gs://', known_args.bucket, blob.name))
+                input_files.append(blob.name)
 
     # start pipeline
     p = beam.Pipeline(options=options)
-    df_dicts = input_files | beam.Map(netcdf_to_df, known_args.variables, known_args.project)
+    df_dicts = input_files | beam.Map(netcdf_to_df, known_args.variables, known_args.project, known_args.bucket)
     df = to_dataframe(df_dicts)
     grouped_df = df.groupby(['time', 'lat', 'lon', 'model']).sum()
     df_pc = to_pcollection(grouped_df)
