@@ -31,7 +31,7 @@ def netcdf_to_df(gcs_filepath, all_vars, proj_name):
 def run(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('--start_path', 
-                default='gs://unresolved_mcf/template_mcf_imports/nasa_ipcc/NEX-DCP30/BCSD/rcp85/mon')
+                default='gs://unresolved_mcf/template_mcf_imports/nasa_ipcc/NEX-DCP30/BCSD/rcp85/mon/atmos')
     parser.add_argument('--variables', default=['tasmax', 'tasmin', 'pr'])
     parser.add_argument('--end-path', default='r1i1p1/v1.0/test_data_small')
     parser.add_argument('--output', default='ipcc/rcp85_merged')
