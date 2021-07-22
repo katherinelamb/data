@@ -3,7 +3,7 @@ from google3.pipeline.flume.py import runner
 from absl import app
 from absl import flags
 
-from ipcc_preprocessing_flume import process_netcdfs
+from ipcc_preprocessing_beam import process_netcdfs
 
 flags.DEFINE_string('start_path',
                     '/usr/local/google/home/lambk/ipcc_data/rcp85/mon/atmos',
