@@ -30,10 +30,11 @@ def netcdf_to_df(gcs_filepath, all_vars, proj_name):
 
 def run(argv=None):
     parser = argparse.ArgumentParser()
-    parser.add_argument('--start_path', 
-                default='gs://unresolved_mcf/template_mcf_imports/nasa_ipcc/NEX-DCP30/BCSD/rcp85/mon/atmos')
+    parser.add_argument('--bucket', default='unresolved_mcf')
+    parser.add_argument('--prefix_start', 
+                default='template_mcf_imports/nasa_ipcc/NEX-DCP30/BCSD/rcp85/mon/atmos')
     parser.add_argument('--variables', default=['tasmax', 'tasmin', 'pr'])
-    parser.add_argument('--end-path', default='r1i1p1/v1.0/test_data_small')
+    parser.add_argument('--prefix_end', default='r1i1p1/v1.0/test_data_small')
     parser.add_argument('--output', default='ipcc/rcp85_merged')
     parser.add_argument('--project', default='datcom-204919')
     known_args, pipeline_args = parser.parse_known_args(argv)
@@ -50,11 +51,11 @@ def run(argv=None):
     input_files = []
     storage_client = storage.Client(project=known_args.project)
     for v in known_args.variables:
-        bucket_path = os.path.join(known_args.start_path, v, known_args.end_path)
-        bucket = storage_client.get_bucket(bucket_path)
-        for blob in bucket.list_blobs(prefix='DIRECTORY'):
+        bucket = storage_client.get_bucket(known_args.bucket)
+        prefix = os.path.join(known_args.prefix_start, v, known_args.prefix_end)
+        for blob in bucket.list_blobs(prefix=prefix):
             if blob.name.endswith('.nc'):
-                input_files.append(os.path.join(bucket_path, blob.name))
+                input_files.append(os.path.join('gs://', known_args.bucket, blob.name))
 
     # start pipeline
     p = beam.Pipeline(options=options)
