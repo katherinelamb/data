@@ -34,7 +34,7 @@ def run(argv=None):
     parser.add_argument('--start_path', 
                 default='gs://unresolved_mcf/template_mcf_imports/nasa_ipcc/NEX-DCP30/BCSD/rcp85/mon')
     parser.add_argument('--variables', default=['tasmax', 'tasmin', 'pr'])
-    parser.add_argument('--end-path', default='r1i1p1/v1.0/CONUS')
+    parser.add_argument('--end-path', default='r1i1p1/v1.0/test_data_small')
     parser.add_argument('--output', default='ipcc/rcp85_merged')
     parser.add_argument('--project', default='datcom-204919')
     known_args, pipeline_args = parser.parse_known_args(argv)
