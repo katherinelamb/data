@@ -73,14 +73,14 @@ def run(argv=None):
                 input_files.append(blob.name)
 
     # start pipeline
-    p = beam.Pipeline(options=options)
-    df_dicts = input_files | beam.Map(netcdf_to_df, known_args.variables, known_args.project, known_args.bucket)
-    df = to_dataframe(df_dicts)
-    grouped_df = df.groupby(['time', 'lat', 'lon', 'model']).sum()
-    df_pc = to_pcollection(grouped_df)
-    _ = df_pc | beam.io.WriteToText(known_args.output_path, ".csv")
-
-    p.run()
+    with beam.Pipeline(options=options) as p:
+        pc_files = p | beam.Create(input_files)
+        df_dicts = pc_files | beam.Map(netcdf_to_df, known_args.variables, known_args.project, known_args.bucket)
+        df = to_dataframe(df_dicts)
+        grouped_df = df.groupby(['time', 'lat', 'lon', 'model']).sum()
+        df_pc = to_pcollection(grouped_df)
+        _ = df_pc | beam.io.WriteToText(known_args.output_path, ".csv")
+    #p.run()
 
 if __name__ == '__main__':
     logging.getLogger().setLevel(logging.INFO)
