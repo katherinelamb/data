@@ -42,7 +42,7 @@ def run(argv=None):
     options = PipelineOptions(flags=argv)
     google_cloud_options = options.view_as(GoogleCloudOptions)
     google_cloud_options.project=known_args.project
-    google_cloud_options.job_name='nasa_ipcc'
+    google_cloud_options.job_name='ipcc'
     google_cloud_options.staging_location='gs://datcom-dataflow-staging-dev/nasa_ipcc_staging'
     google_cloud_options.temp_location='gs://datcom-dataflow-staging-dev/nasa_ipcc_temp'
     google_cloud_options.region='us-central1'
