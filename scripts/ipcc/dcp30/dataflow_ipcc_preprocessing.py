@@ -9,7 +9,6 @@ from apache_beam.dataframe.convert import to_pcollection
 from apache_beam.options.pipeline_options import PipelineOptions
 from apache_beam.options.pipeline_options import GoogleCloudOptions
 from apache_beam.options.pipeline_options import StandardOptions
-from apache_beam.options.pipeline_options import SetupOptions
 
 def netcdf_to_df(gcs_filepath, all_vars, proj_name):
     client = storage.Client(project=proj_name)
@@ -46,8 +45,6 @@ def run(argv=None):
     google_cloud_options.staging_location='gs://datcom-dataflow-staging-dev/nasa_ipcc_staging'
     google_cloud_options.temp_location='gs://datcom-dataflow-staging-dev/nasa_ipcc_temp'
     options.view_as(StandardOptions).runner = 'DataflowRunner'
-
-    options.view_as(SetupOptions).save_main_sesson = True
 
     # get file paths from GCS 
     input_files = []
