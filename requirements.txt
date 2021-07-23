@@ -7,7 +7,7 @@ frozendict==1.2
 func-timeout==4.3.5
 geojson==2.5.0
 geopandas==0.8.1
-h5netcdf
+hdf5
 matplotlib==3.3.0
 netCDF4
 numpy==1.18.5
