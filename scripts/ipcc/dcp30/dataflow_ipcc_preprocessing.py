@@ -22,7 +22,11 @@ def netcdf_to_df(gcs_filepath, all_vars, proj_name, bucket_name):
     ds['time'] = ds.indexes['time'].normalize()
     df = ds[curr_var_name].to_dataframe()
     df['model'] = model_name
-    df = df.reset_index()
+    # don't need reset index call if not doing joins - csv will save correctly
+    #df = df.reset_index()
+    
+    # Update: no join, add in column for variable name and scenario
+
     # add in columns of 0s for other variables, this makes the to_dataframe and
     # groupby calls work
     # figure out what to do about nans
