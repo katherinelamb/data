@@ -25,6 +25,7 @@ def netcdf_to_df(gcs_filepath, all_vars, proj_name, bucket_name):
     df = df.reset_index()
     # add in columns of 0s for other variables, this makes the to_dataframe and
     # groupby calls work
+    # figure out what to do about nans
     for var in all_vars:
         if var != curr_var_name:
             df[var] = 0
@@ -34,7 +35,7 @@ def netcdf_to_df(gcs_filepath, all_vars, proj_name, bucket_name):
 def run(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('--bucket', default='unresolved_mcf')
-    parser.add_argument('--prefix_start', 
+    parser.add_argument('--prefix_start',
                 default='template_mcf_imports/nasa_ipcc/NEX-DCP30/BCSD/rcp85/mon/atmos')
     parser.add_argument('--variables', default=['tasmax', 'tasmin', 'pr'])
     parser.add_argument('--prefix_end', default='r1i1p1/v1.0/test_data_small')
@@ -59,7 +60,8 @@ def run(argv=None):
         job_name='ipcc-test',
         staging_location='gs://datcom-dataflow-staging-dev/nasa_ipcc_staging',
         temp_location='gs://datcom-dataflow-staging-dev/nasa_ipcc_temp',
-        region='us-central1'
+        region='us-central1',
+        save_main_session=True
     )
 
     # get file paths from GCS 
