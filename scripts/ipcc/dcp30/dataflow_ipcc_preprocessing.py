@@ -76,6 +76,10 @@ def run(argv=None):
     with beam.Pipeline(options=options) as p:
         pc_files = p | beam.Create(input_files)
         df_dicts = pc_files | beam.Map(netcdf_to_df, known_args.variables, known_args.project, known_args.bucket)
+        df_schema = df_dicts | beam.Select(time=lambda item: item['time'], lat=lambda item: float(item['lat']),
+                                            lon=lambda item: float(item['lon']), model=lambda item: str(item['model']),
+                                            tasmax=lambda item: float(item['tasmax']), tasmin=lambda item: float(item['tasmin']),
+                                            pr=lambda item: float(item['pr']))
         df = to_dataframe(df_dicts)
         grouped_df = df.groupby(['time', 'lat', 'lon', 'model']).sum()
         df_pc = to_pcollection(grouped_df)
