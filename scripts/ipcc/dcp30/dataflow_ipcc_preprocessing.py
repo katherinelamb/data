@@ -83,7 +83,7 @@ def run(argv=None):
         df = to_dataframe(df_schema)
         grouped_df = df.groupby(['time', 'lat', 'lon', 'model']).sum()
         #df_pc = to_pcollection(grouped_df)
-        _ = grouped_df | beam.io.WriteToText(known_args.output_path, ".csv")
+        _ = grouped_df | beam.io.WriteToText(known_args.output, ".csv")
     #p.run()
 
 if __name__ == '__main__':
