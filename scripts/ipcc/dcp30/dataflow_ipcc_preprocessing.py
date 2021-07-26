@@ -81,10 +81,11 @@ def run(argv=None):
                                             variable_value=lambda item: float(item['variable_value']), 
                                             variable_name=lambda item: str(item['variable_name']),
                                             scenario=lambda item: str(item['scenario']))
+        # maybe can go straight to csv? 
         df = to_dataframe(df_schema)
         #grouped_df = df.groupby(['time', 'lat', 'lon', 'model']).sum()
-        #df_pc = to_pcollection(grouped_df)
-        _ = df | beam.io.WriteToText(known_args.output, ".csv")
+        df_pc = to_pcollection(df)
+        _ = df_pc | beam.io.WriteToText(known_args.output, ".csv")
     #p.run()
 
 if __name__ == '__main__':
