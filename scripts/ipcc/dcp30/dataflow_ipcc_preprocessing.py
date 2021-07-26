@@ -11,28 +11,31 @@ from apache_beam.options.pipeline_options import PipelineOptions
 from apache_beam.options.pipeline_options import GoogleCloudOptions
 from apache_beam.options.pipeline_options import StandardOptions
 
-def netcdf_to_df(gcs_filepath, all_vars, proj_name, bucket_name):
+def netcdf_to_df(gcs_filepath, all_vars, proj_name, bucket_name, scenario_name):
     client = storage.Client(project=proj_name)
     bucket = client.get_bucket(bucket_name)
     blob = bucket.blob(gcs_filepath) 
     blob.download_to_filename('temp.nc')
     ds = xr.open_dataset('temp.nc', engine='netcdf4')
+    # turn into a dataframe
     model_name = ds.attrs['driving_model_id']
     curr_var_name = ds.attrs['variableName']
     ds['time'] = ds.indexes['time'].normalize()
     df = ds[curr_var_name].to_dataframe()
     df['model'] = model_name
-    # don't need reset index call if not doing joins - csv will save correctly
-    #df = df.reset_index()
+    df['scenario'] = scenario_name
+    df['variable_name'] = curr_var_name
+    df = df.rename(columns={curr_var_name: 'variable_value'})
     
-    # Update: no join, add in column for variable name and scenario
-
+    '''
     # add in columns of 0s for other variables, this makes the to_dataframe and
     # groupby calls work
     # figure out what to do about nans
     for var in all_vars:
         if var != curr_var_name:
             df[var] = 0
+    '''
+    df = df.reset_index()
     df_dict = df.to_dict(orient='list')
     return df_dict
 
@@ -47,16 +50,7 @@ def run(argv=None):
     parser.add_argument('--project', default='datcom-204919')
     known_args, pipeline_args = parser.parse_known_args(argv)
 
-    '''
-    options = PipelineOptions(flags=argv)
-    google_cloud_options = options.view_as(GoogleCloudOptions)
-    google_cloud_options.project=known_args.project
-    google_cloud_options.job_name='ipcc'
-    google_cloud_options.staging_location='gs://datcom-dataflow-staging-dev/nasa_ipcc_staging'
-    google_cloud_options.temp_location='gs://datcom-dataflow-staging-dev/nasa_ipcc_temp'
-    google_cloud_options.region='us-central1'
-    options.view_as(StandardOptions).runner = 'DataflowRunner'
-    '''
+   
     options = PipelineOptions(
         pipeline_args,
         runner='DataflowRunner',
@@ -84,12 +78,13 @@ def run(argv=None):
         df_dicts = pc_files | beam.Map(netcdf_to_df, known_args.variables, known_args.project, known_args.bucket)
         df_schema = df_dicts | beam.Select(time=lambda item: item['time'], lat=lambda item: float(item['lat']),
                                             lon=lambda item: float(item['lon']), model=lambda item: str(item['model']),
-                                            tasmax=lambda item: float(item['tasmax']), tasmin=lambda item: float(item['tasmin']),
-                                            pr=lambda item: float(item['pr']))
+                                            variable_value=lambda item: float(item['variable_value']), 
+                                            variable_name=lambda item: str(item['variable_name']),
+                                            scenario=lambda item: str(item['scenario']))
         df = to_dataframe(df_schema)
-        grouped_df = df.groupby(['time', 'lat', 'lon', 'model']).sum()
+        #grouped_df = df.groupby(['time', 'lat', 'lon', 'model']).sum()
         #df_pc = to_pcollection(grouped_df)
-        _ = grouped_df | beam.io.WriteToText(known_args.output, ".csv")
+        _ = df | beam.io.WriteToText(known_args.output, ".csv")
     #p.run()
 
 if __name__ == '__main__':
