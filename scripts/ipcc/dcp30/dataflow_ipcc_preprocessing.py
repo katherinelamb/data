@@ -48,7 +48,7 @@ def run(argv=None):
     parser.add_argument('--variables', default=['tasmax', 'tasmin', 'pr'])
     parser.add_argument('--scenario', default='RCP8.5')
     parser.add_argument('--prefix_end', default='r1i1p1/v1.0/test_data_small')
-    parser.add_argument('--output', default='ipcc/rcp85_merged')
+    parser.add_argument('--output', default='gs://unresolved_mcf/template_mcf_imports/nasa_ipcc/RCP85_csvs/processed')
     parser.add_argument('--project', default='datcom-204919')
     known_args, pipeline_args = parser.parse_known_args(argv)
 
