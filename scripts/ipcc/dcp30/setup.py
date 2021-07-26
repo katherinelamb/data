@@ -89,6 +89,7 @@ class CustomCommands(setuptools.Command):
 # restriction is specified.
 REQUIRED_PACKAGES = [
     'xarray',
+    'netcdf4',
     'google-cloud-storage'
 ]
 
