@@ -8,10 +8,9 @@ from google.cloud import storage
 from apache_beam.dataframe.convert import to_dataframe
 from apache_beam.dataframe.convert import to_pcollection
 from apache_beam.options.pipeline_options import PipelineOptions
-from apache_beam.options.pipeline_options import GoogleCloudOptions
-from apache_beam.options.pipeline_options import StandardOptions
 
-def netcdf_to_df(gcs_filepath, all_vars, proj_name, bucket_name, scenario_name):
+
+def netcdf_to_df(gcs_filepath, proj_name, bucket_name, scenario_name):
     client = storage.Client(project=proj_name)
     bucket = client.get_bucket(bucket_name)
     blob = bucket.blob(gcs_filepath) 
@@ -36,8 +35,9 @@ def netcdf_to_df(gcs_filepath, all_vars, proj_name, bucket_name, scenario_name):
             df[var] = 0
     '''
     df = df.reset_index()
-    df_dict = df.to_dict(orient='list')
-    return df_dict
+    #df_dict = df.to_dict(orient='list')
+    csv_str = df.to_csv(index=False)
+    return csv_str
 
 def run(argv=None):
     parser = argparse.ArgumentParser()
@@ -76,7 +76,8 @@ def run(argv=None):
     # start pipeline
     with beam.Pipeline(options=options) as p:
         pc_files = p | beam.Create(input_files)
-        df_dicts = pc_files | beam.Map(netcdf_to_df, known_args.variables, known_args.project, known_args.bucket, known_args.scenario)
+        csv_strs = pc_files | beam.Map(netcdf_to_df, known_args.variables, known_args.project, known_args.bucket, known_args.scenario)
+        '''
         df_schema = df_dicts | beam.Select(time=lambda item: item['time'], lat=lambda item: float(item['lat']),
                                             lon=lambda item: float(item['lon']), model=lambda item: str(item['model']),
                                             variable_value=lambda item: float(item['variable_value']), 
@@ -86,7 +87,8 @@ def run(argv=None):
         df = to_dataframe(df_schema)
         #grouped_df = df.groupby(['time', 'lat', 'lon', 'model']).sum()
         df_pc = to_pcollection(df)
-        _ = df_pc | beam.io.WriteToText(known_args.output, ".csv")
+        '''
+        _ = csv_strs | beam.io.WriteToText(known_args.output, ".csv", append_trailing_newlines=False)
     #p.run()
 
 if __name__ == '__main__':
