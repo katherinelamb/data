@@ -40,6 +40,7 @@ def netcdf_to_df(gcs_filepath, proj_name, bucket_name, scenario_name):
     return csv_str
 
 def run(argv=None):
+    # take out variables argument, not needed
     parser = argparse.ArgumentParser()
     parser.add_argument('--bucket', default='unresolved_mcf')
     parser.add_argument('--prefix_start',
@@ -76,7 +77,7 @@ def run(argv=None):
     # start pipeline
     with beam.Pipeline(options=options) as p:
         pc_files = p | beam.Create(input_files)
-        csv_strs = pc_files | beam.Map(netcdf_to_df, known_args.variables, known_args.project, known_args.bucket, known_args.scenario)
+        csv_strs = pc_files | beam.Map(netcdf_to_df, known_args.project, known_args.bucket, known_args.scenario)
         '''
         df_schema = df_dicts | beam.Select(time=lambda item: item['time'], lat=lambda item: float(item['lat']),
                                             lon=lambda item: float(item['lon']), model=lambda item: str(item['model']),
