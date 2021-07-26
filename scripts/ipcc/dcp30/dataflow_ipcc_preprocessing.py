@@ -57,7 +57,7 @@ def run(argv=None):
         pipeline_args,
         runner='DataflowRunner',
         project='datcom-204919',
-        job_name='ipcc-test',
+        job_name='ipcc-test-parallelization',
         staging_location='gs://datcom-dataflow-staging-dev/nasa_ipcc_staging',
         temp_location='gs://datcom-dataflow-staging-dev/nasa_ipcc_temp',
         region='us-central1',
