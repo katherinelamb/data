@@ -45,6 +45,7 @@ def run(argv=None):
     parser.add_argument('--prefix_start',
                 default='template_mcf_imports/nasa_ipcc/NEX-DCP30/BCSD/rcp85/mon/atmos')
     parser.add_argument('--variables', default=['tasmax', 'tasmin', 'pr'])
+    parser.add_argument('--scenario', default='RCP8.5')
     parser.add_argument('--prefix_end', default='r1i1p1/v1.0/test_data_small')
     parser.add_argument('--output', default='ipcc/rcp85_merged')
     parser.add_argument('--project', default='datcom-204919')
@@ -75,7 +76,7 @@ def run(argv=None):
     # start pipeline
     with beam.Pipeline(options=options) as p:
         pc_files = p | beam.Create(input_files)
-        df_dicts = pc_files | beam.Map(netcdf_to_df, known_args.variables, known_args.project, known_args.bucket)
+        df_dicts = pc_files | beam.Map(netcdf_to_df, known_args.variables, known_args.project, known_args.bucket, known_args.scenario)
         df_schema = df_dicts | beam.Select(time=lambda item: item['time'], lat=lambda item: float(item['lat']),
                                             lon=lambda item: float(item['lon']), model=lambda item: str(item['model']),
                                             variable_value=lambda item: float(item['variable_value']), 
