@@ -46,7 +46,7 @@ def run(argv=None):
     parser.add_argument('--bucket', default='unresolved_mcf')
     parser.add_argument('--prefix_start',
                 default='template_mcf_imports/nasa_ipcc/NEX-DCP30/BCSD/rcp85/mon/atmos')
-    #parser.add_argument('--variables', default=['tasmax', 'tasmin', 'pr'])
+    parser.add_argument('--variables', default=['tasmax', 'tasmin', 'pr'])
     #parser.add_argument('--scenario', default='RCP8.5')
     parser.add_argument('--prefix_end', default='r1i1p1/v1.0/test_data_small')
     parser.add_argument('--output', default='gs://unresolved_mcf/template_mcf_imports/nasa_ipcc/RCP85_csvs/processed')
